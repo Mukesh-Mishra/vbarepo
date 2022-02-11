@@ -1,0 +1,10 @@
+Sub Which_Account_Number()
+
+    Dim objOutApp As Object
+    Set objOutApp = CreateObject("Outlook.Application")
+
+    Dim i As Integer
+    For i = 1 To objOutApp.Session.Accounts.Count
+        MsgBox objOutApp.Session.Accounts.Item(i) & " : This is account number " & i
+    Next i
+End Sub
