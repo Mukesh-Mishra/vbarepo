@@ -1,0 +1,49 @@
+Public Sub Save_Excel__Pictures()
+
+    Dim saveOutputInFolder As String
+    Dim shp As Shape
+ 
+    saveOutputInFolder = Application.ActiveWorkbook.Path & "\output\"
+    CheckDir (saveOutputInFolder)
+    If Right(saveOutputInFolder, 1) <> "\" Then saveOutputInFolder = saveOutputInFolder & "\"
+       
+    For Each shp In ActiveSheet.Shapes
+        If shp.Type = msoPicture And shp.TopLeftCell.Column = 2 Then
+            Save_Object_As_Picture shp, saveOutputInFolder & shp.TopLeftCell.Offset(0, -1).Value & ".jpg"
+        End If
+    Next
+End Sub
+
+Sub CheckDir(strFolderPath As String)
+'strFolderPath = Environ("USERPROFILE") & "\Desktop\TEST\"
+strFolderPath = Application.ActiveWorkbook.Path & "\output\"
+mkdir_if_not_exits (strFolderPath)
+End Sub
+
+Function mkdir_if_not_exits(Path As String)
+    If Dir(Path, vbDirectory) = "" Then
+        MkDir (Path)
+    End If
+End Function
+
+Private Sub Save_Object_As_Picture(saveObject As Object, imageFileName As String, Optional scaleFactor As Single)
+
+    Dim tempChart As ChartObject
+    Application.ScreenUpdating = False
+    saveObject.CopyPicture xlScreen, xlPicture
+    Set tempChart = ActiveSheet.ChartObjects.Add(0, 0, saveObject.Width, saveObject.Height)
+    With tempChart
+        .Activate                               'Required, otherwise image is blank
+        DoEvents
+        .Border.LineStyle = xlLineStyleNone     'No border
+        .Chart.Paste
+        If scaleFactor > 0 Then
+            .Width = .Width * scaleFactor
+            .Height = .Height * scaleFactor
+        End If
+        .Chart.Export imageFileName
+        .Delete
+    End With
+    Application.ScreenUpdating = True
+    Set tempChart = Nothing
+End Sub
