@@ -1,0 +1,66 @@
+Option Explicit
+
+Sub send_email()
+   
+    ' SET Outlook APPLICATION OBJECT.
+    Dim objOutApp As Object
+    Set objOutApp = CreateObject("Outlook.Application")
+    
+    'Declare Email Item Object
+    Dim objEmailItem As Object
+    
+    
+    'SET FROM ACCOUNT
+    Dim objOutAccount As Object
+    '#####Use the first account, see that Item is 1 now
+    ''Set objOutAccount = objOutApp.Session.Accounts.Item(1)
+    '######Or us the name instead of the number
+    '''Set objOutAccount = objOutApp.Session.Accounts("From - email address here")
+    
+    
+    ' SET EXCEL.
+    Dim mySheet As Worksheet
+    Set mySheet = ThisWorkbook.Sheets("Sheet1")
+    Dim i As Integer
+    Dim last_row_number As Integer
+    last_row_number = Application.WorksheetFunction.CountA(mySheet.Range("A:A"))
+    
+        
+    'LOOP START
+    On Error Resume Next
+    For i = 2 To last_row_number  ' from i=2 because first row is header
+    Set objEmailItem = objOutApp.createitem(0)
+    
+    With objEmailItem
+    ''.SentOnBehalfOfName = "From - email address here"
+    .To = mySheet.Range("A" & i).Value
+    .BCC = "BCC - email address here"
+    .Subject = "My Subject"
+    
+    Dim sImgageName As String
+    sImgageName = ThisWorkbook.Path & "\img.jpg"
+    .Attachments.Add sImgageName, 1, 0
+    .HTMLBody = "<html><p>Hi, .</p>" & " <a href='https://github.com/Mukesh-Mishra/excelvbarepo'><img src='cid:img.jpg' height=520 width=750>" & "</html>"
+    
+    .Attachments.Add (ThisWorkbook.Path & "\FINAL.pdf")
+    
+    'This is to check cell value and attached excel range
+    ''If mySheet.Range("E" & i).Value <> "" Then
+    ''objEmailItem.attachments.Add mySheet.Range("E" & i).Value
+    ''End If
+    
+    .Display
+    '.Send
+    End With
+    
+    
+    Next i
+    MsgBox ("Hello,Sent Successfully....!")
+    
+    
+    ' TO CLEAR.
+    Set objEmailItem = Nothing
+    Set objOutApp = Nothing
+
+End Sub
+
